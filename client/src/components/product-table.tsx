@@ -40,6 +40,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { AddProductModal } from './add-product-modal';
+import { EditProductModal } from './edit-product-modal';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -55,6 +56,8 @@ export function ProductTable() {
   const [sortBy, setSortBy] = useState('name-asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
   const { data: products = [], isLoading } = useQuery<Product[]>({
     queryKey: ['/api/products']
@@ -128,7 +131,10 @@ export function ProductTable() {
   async function handleDeleteProduct(id: number) {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await apiRequest('DELETE', `/api/products/${id}`);
+        const response = await apiRequest('DELETE', `/api/products/${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to delete product');
+        }
         toast({
           title: 'Success',
           description: 'Product has been deleted successfully',
@@ -143,6 +149,11 @@ export function ProductTable() {
         });
       }
     }
+  }
+  
+  async function handleEditProduct(product: Product) {
+    setSelectedProduct(product);
+    setIsEditModalOpen(true);
   }
   
   function resetFilters() {
@@ -292,7 +303,12 @@ export function ProductTable() {
                       {isAdmin && (
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-2">
-                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="h-8 w-8 p-0"
+                              onClick={() => handleEditProduct(product)}
+                            >
                               <Pencil className="h-4 w-4 text-primary" />
                             </Button>
                             <Button 
@@ -362,10 +378,17 @@ export function ProductTable() {
       </div>
       
       {isAdmin && (
-        <AddProductModal 
-          isOpen={isAddModalOpen} 
-          onClose={() => setIsAddModalOpen(false)}
-        />
+        <>
+          <AddProductModal 
+            isOpen={isAddModalOpen} 
+            onClose={() => setIsAddModalOpen(false)}
+          />
+          <EditProductModal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            product={selectedProduct}
+          />
+        </>
       )}
     </div>
   );

@@ -253,23 +253,18 @@ export class MemStorage implements IStorage {
   }
   
   async createSale(sale: InsertSale): Promise<Sale> {
-    const id = this.saleId++;
-    const newSale: Sale = { 
-      ...sale, 
-      id,
-      createdAt: new Date()
-    };
-    this.sales.set(id, newSale);
-    
-    // Update product stock
-    const product = this.products.get(sale.productId);
-    if (product) {
-      product.stock -= sale.quantity;
-      this.products.set(product.id, product);
-    }
-    
-    return newSale;
+  // First insert the sale
+  const result = await this.db.insert(sales).values(sale);
+  
+  // Then update the product stock
+  const product = await this.getProduct(sale.productId);
+  if (product) {
+    const newStock = Math.max(0, product.stock - sale.quantity);
+    await this.updateProduct(product.id, { stock: newStock });
   }
+  
+  return result[0];
+}
   
   // Reports operations
   async getTotalSales(): Promise<number> {
@@ -295,32 +290,50 @@ export class MemStorage implements IStorage {
   }
 }
 
-// PostgreSQL storage implementation
-import { drizzle } from 'drizzle-orm/node-postgres';
+// MySQL storage implementation
+import { drizzle } from 'drizzle-orm/mysql2';
 import { eq, lte, desc } from 'drizzle-orm';
-import pg from 'pg';
-import connectPg from 'connect-pg-simple';
+import mysql from 'mysql2/promise';
+import session from 'express-session';
+import MySQLStore from 'express-mysql-session';
 
-const { Pool } = pg;
-
-// Create a new pool for PostgreSQL connections
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+// Create a new pool for MySQL connections
+const pool = await mysql.createPool({
+  user: 'root',
+  password: '1234',
+  host: '127.0.0.1',
+  port: 3306,
+  database: 'ashe'
 });
 
 export class DatabaseStorage implements IStorage {
   private db;
+  
+  private saleId: number;
+  private sales: Map<number, Sale>;
+  private products: Map<number, Product>;
   sessionStore: session.Store;
   
   constructor() {
-    this.db = drizzle(pool);
     
-    // Create session store with PostgreSQL
-    const PostgresSessionStore = connectPg(session);
-    this.sessionStore = new PostgresSessionStore({ 
-      pool, 
-      createTableIfMissing: true 
-    });
+    this.saleId = 1;
+    this.db = drizzle(pool);  
+    this.sales = new Map();
+    this.products = new Map();
+    
+    // Create session store with MySQL
+    const MySQLSessionStore = MySQLStore(session);
+    this.sessionStore = new MySQLSessionStore({
+      createDatabaseTable: true,
+      schema: {
+        tableName: 'sessions',
+        columnNames: {
+          session_id: 'session_id',
+          expires: 'expires',
+          data: 'data'
+        }
+      }
+    }, pool);
     
     // Initialize database with sample data if needed
     this.initializeDatabase();
@@ -435,8 +448,9 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createUser(user: InsertUser): Promise<User> {
-    const result = await this.db.insert(users).values(user).returning();
-    return result[0];
+    const result = await this.db.insert(users).values(user);
+    const [newUser] = await this.db.select().from(users).where(eq(users.username, user.username));
+    return newUser;
   }
   
   async getUsers(): Promise<User[]> {
@@ -454,20 +468,22 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createProduct(product: InsertProduct): Promise<Product> {
-    const result = await this.db.insert(products).values(product).returning();
-    return result[0];
+    const result = await this.db.insert(products).values(product);
+    const [newProduct] = await this.db.select().from(products).where(eq(products.sku, product.sku));
+    return newProduct;
   }
   
   async updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product | undefined> {
-    const result = await this.db.update(products)
+    await this.db.update(products)
       .set(product)
-      .where(eq(products.id, id))
-      .returning();
-    return result[0];
+      .where(eq(products.id, id));
+    const [updatedProduct] = await this.db.select().from(products).where(eq(products.id, id));
+    return updatedProduct;
   }
   
   async deleteProduct(id: number): Promise<boolean> {
-    const result = await this.db.delete(products).where(eq(products.id, id)).returning();
+    console.log(id)
+    const result = await this.db.delete(products).where(eq(products.id, id));
     return result.length > 0;
   }
   
@@ -482,12 +498,13 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createCategory(category: InsertCategory): Promise<Category> {
-    const result = await this.db.insert(categories).values(category).returning();
-    return result[0];
+    const result = await this.db.insert(categories).values(category);
+    const [newCategory] = await this.db.select().from(categories).where(eq(categories.name, category.name));
+    return newCategory;
   }
   
   async deleteCategory(id: number): Promise<boolean> {
-    const result = await this.db.delete(categories).where(eq(categories.id, id)).returning();
+    const result = await this.db.delete(categories).where(eq(categories.id, id));
     return result.length > 0;
   }
   
@@ -503,7 +520,13 @@ export class DatabaseStorage implements IStorage {
   
   async createSale(sale: InsertSale): Promise<Sale> {
     // First insert the sale
-    const result = await this.db.insert(sales).values(sale).returning();
+    await this.db.insert(sales).values(sale);
+    
+    // Get the newly created sale
+    const [newSale] = await this.db.select()
+      .from(sales)
+      .orderBy(desc(sales.id))
+      .limit(1);
     
     // Then update the product stock
     const product = await this.getProduct(sale.productId);
@@ -512,7 +535,7 @@ export class DatabaseStorage implements IStorage {
       await this.updateProduct(product.id, { stock: newStock });
     }
     
-    return result[0];
+    return newSale;
   }
   
   // Reports operations

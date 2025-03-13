@@ -98,13 +98,9 @@ export function Sidebar({ isOpen, onClose, currentUser }: SidebarProps) {
         
         {/* Navigation Links */}
         <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            // Skip items that require admin role if user is not admin
-            if (item.role === 'admin' && currentUser.role !== 'admin') {
-              return null;
-            }
-            
-            return (
+          {navItems
+            .filter(item => !item.role || item.role === currentUser.role)
+            .map((item) => (
               <Link 
                 key={item.path} 
                 href={item.path} 
@@ -118,8 +114,7 @@ export function Sidebar({ isOpen, onClose, currentUser }: SidebarProps) {
                 {item.icon}
                 {item.name}
               </Link>
-            );
-          })}
+            ))}
         </nav>
         
         {/* Sidebar Footer */}

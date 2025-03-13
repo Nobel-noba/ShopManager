@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
-import type { Category } from '@shared/schema';
+import type { Category, Product } from '@shared/schema';
 import { 
   Dialog, 
   DialogContent, 
@@ -16,7 +16,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { 
   Form, 
   FormControl, 
@@ -36,12 +35,13 @@ import { insertProductSchema } from '@shared/schema';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
-interface AddProductModalProps {
+interface EditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
+  product: Product | null;
 }
 
-export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
+export function EditProductModal({ isOpen, onClose, product }: EditProductModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,23 +59,40 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      sku: "",
-      category: "", // Remove default category
-      price: "",
-      cost: "",
-      stock: 0,
-      description: ""
+      name: product?.name || "",
+      sku: product?.sku || "",
+      category: product?.category || "",
+      price: product?.price || "",
+      cost: product?.cost || "",
+      stock: product?.stock || 0,
+      description: product?.description || ""
     },
   });
 
+  // Update form values when product changes
+  useEffect(() => {
+    if (product) {
+      form.reset({
+        name: product.name,
+        sku: product.sku,
+        category: product.category,
+        price: product.price,
+        cost: product.cost,
+        stock: product.stock,
+        description: product.description || ""
+      });
+    }
+  }, [product]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!product) return;
+    
     setIsSubmitting(true);
     try {
-      await apiRequest('POST', '/api/products', values);
+      await apiRequest('PATCH', `/api/products/${product.id}`, values);
       toast({
         title: 'Success',
-        description: 'Product has been added successfully',
+        description: 'Product has been updated successfully',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/products'] });
       queryClient.invalidateQueries({ queryKey: ['/api/reports/dashboard'] });
@@ -84,7 +101,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     } catch (error) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to add product',
+        description: error instanceof Error ? error.message : 'Failed to update product',
         variant: 'destructive',
       });
     } finally {
@@ -96,9 +113,9 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New Product</DialogTitle>
+          <DialogTitle>Edit Product</DialogTitle>
           <DialogDescription>
-            Fill in the details to add a new product to your inventory.
+            Update the product details in your inventory.
           </DialogDescription>
         </DialogHeader>
         
@@ -166,7 +183,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 name="stock"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Initial Stock</FormLabel>
+                    <FormLabel>Stock</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -246,7 +263,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 <Button type="button" variant="outline">Cancel</Button>
               </DialogClose>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Adding...' : 'Add Product'}
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
               </Button>
             </DialogFooter>
           </form>

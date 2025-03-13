@@ -1,14 +1,14 @@
-import { pgTable, text, serial, integer, boolean, numeric, timestamp } from "drizzle-orm/pg-core";
+import { mysqlTable, varchar, int, decimal, timestamp, serial, text, numeric } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // User model
-export const users = pgTable("users", {
+export const users = mysqlTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  name: text("name").notNull(),
-  role: text("role").notNull().default("staff"),
+  username: varchar("username", { length: 255 }).notNull().unique(),
+  password: varchar("password", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  role: varchar("role", { length: 50 }).notNull().default("staff"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -19,14 +19,14 @@ export const insertUserSchema = createInsertSchema(users).pick({
 });
 
 // Product model
-export const products = pgTable("products", {
+export const products = mysqlTable("products", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  sku: text("sku").notNull().unique(),
-  category: text("category").notNull(),
-  price: numeric("price").notNull(),
-  cost: numeric("cost").notNull(),
-  stock: integer("stock").notNull().default(0),
+  name: varchar("name", { length: 255 }).notNull(),
+  sku: varchar("sku", { length: 100 }).notNull().unique(),
+  category: varchar("category", { length: 100 }).notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  cost: decimal("cost", { precision: 10, scale: 2 }).notNull(),
+  stock: int("stock").notNull().default(0),
   description: text("description"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -42,12 +42,12 @@ export const insertProductSchema = createInsertSchema(products).pick({
 });
 
 // Sales model
-export const sales = pgTable("sales", {
+export const sales = mysqlTable("sales", {
   id: serial("id").primaryKey(),
-  productId: integer("product_id").notNull(),
-  quantity: integer("quantity").notNull(),
-  price: numeric("price").notNull(),
-  total: numeric("total").notNull(),
+  productId: int("product_id").notNull(),
+  quantity: int("quantity").notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -59,9 +59,9 @@ export const insertSaleSchema = createInsertSchema(sales).pick({
 });
 
 // Categories model
-export const categories = pgTable("categories", {
+export const categories = mysqlTable("categories", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull().unique(),
   description: text("description"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
