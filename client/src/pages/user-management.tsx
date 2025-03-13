@@ -61,7 +61,7 @@ export default function UserManagement() {
   
   // Form schema
   const formSchema = z.object({
-    username: z.string().min(3, "Username must be at least 3 characters"),
+    username: z.string().email("Please enter a valid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     name: z.string().min(1, "Name is required"),
     role: z.enum(["admin", "staff"])
@@ -126,9 +126,9 @@ export default function UserManagement() {
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Username</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input type="email" placeholder="user@example.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -214,7 +214,7 @@ export default function UserManagement() {
               <TableHeader>
                 <TableRow>
                   <TableHead>User</TableHead>
-                  <TableHead>Username</TableHead>
+                  <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
