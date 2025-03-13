@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
 import { AddProductModal } from './add-product-modal';
 
 const ITEMS_PER_PAGE = 10;
@@ -45,6 +46,8 @@ const ITEMS_PER_PAGE = 10;
 export function ProductTable() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all-categories');
@@ -164,9 +167,11 @@ export function ProductTable() {
             />
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           </div>
-          <Button onClick={() => setIsAddModalOpen(true)}>
-            Add Product
-          </Button>
+          {isAdmin && (
+            <Button onClick={() => setIsAddModalOpen(true)}>
+              Add Product
+            </Button>
+          )}
         </div>
       </div>
       
@@ -238,19 +243,19 @@ export function ProductTable() {
                 <TableHead>Price</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                {isAdmin && <TableHead className="text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-10">
+                  <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-10">
                     Loading products...
                   </TableCell>
                 </TableRow>
               ) : paginatedProducts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-10">
+                  <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-10">
                     No products found.
                   </TableCell>
                 </TableRow>
@@ -284,21 +289,23 @@ export function ProductTable() {
                           {status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                            <Pencil className="h-4 w-4 text-primary" />
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            className="h-8 w-8 p-0"
-                            onClick={() => handleDeleteProduct(product.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-red-600" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                      {isAdmin && (
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-2">
+                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                              <Pencil className="h-4 w-4 text-primary" />
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="h-8 w-8 p-0"
+                              onClick={() => handleDeleteProduct(product.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      )}
                     </TableRow>
                   );
                 })
@@ -354,10 +361,12 @@ export function ProductTable() {
         )}
       </div>
       
-      <AddProductModal 
-        isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)}
-      />
+      {isAdmin && (
+        <AddProductModal 
+          isOpen={isAddModalOpen} 
+          onClose={() => setIsAddModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
