@@ -4,7 +4,8 @@ import { storage } from "./storage";
 import { 
   insertUserSchema, 
   insertProductSchema, 
-  insertSaleSchema
+  insertSaleSchema,
+  insertCategorySchema
 } from "@shared/schema";
 import { z } from "zod";
 import passport from "passport";
@@ -211,6 +212,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(500).json({ message: "Error creating user" });
       }
+    }
+  });
+  
+  // Category routes
+  app.get("/api/categories", async (req, res) => {
+    try {
+      const categories = await storage.getCategories();
+      res.json(categories);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching categories" });
+    }
+  });
+  
+  app.post("/api/categories", async (req, res) => {
+    try {
+      const data = insertCategorySchema.parse(req.body);
+      const category = await storage.createCategory(data);
+      res.status(201).json(category);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid category data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Error creating category" });
+      }
+    }
+  });
+  
+  app.delete("/api/categories/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteCategory(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting category" });
     }
   });
   

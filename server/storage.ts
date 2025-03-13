@@ -44,20 +44,24 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private products: Map<number, Product>;
   private sales: Map<number, Sale>;
+  private categories: Map<number, Category>;
   sessionStore: session.Store;
   
   private userId: number;
   private productId: number;
   private saleId: number;
+  private categoryId: number;
 
   constructor() {
     this.users = new Map();
     this.products = new Map();
     this.sales = new Map();
+    this.categories = new Map();
     
     this.userId = 1;
     this.productId = 1;
     this.saleId = 1;
+    this.categoryId = 1;
     
     // Create memory session store
     const MemoryStore = require('memorystore')(session);
@@ -213,6 +217,30 @@ export class MemStorage implements IStorage {
   
   async deleteProduct(id: number): Promise<boolean> {
     return this.products.delete(id);
+  }
+  
+  // Category operations
+  async getCategory(id: number): Promise<Category | undefined> {
+    return this.categories.get(id);
+  }
+  
+  async getCategories(): Promise<Category[]> {
+    return Array.from(this.categories.values());
+  }
+  
+  async createCategory(category: InsertCategory): Promise<Category> {
+    const id = this.categoryId++;
+    const newCategory: Category = {
+      ...category,
+      id,
+      createdAt: new Date()
+    };
+    this.categories.set(id, newCategory);
+    return newCategory;
+  }
+  
+  async deleteCategory(id: number): Promise<boolean> {
+    return this.categories.delete(id);
   }
   
   // Sales operations
