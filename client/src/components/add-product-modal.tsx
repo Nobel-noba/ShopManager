@@ -56,7 +56,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     defaultValues: {
       name: '',
       sku: '',
-      category: '',
+      category: 'Clothing', // Set a default category value
       price: '',
       cost: '',
       stock: 0,

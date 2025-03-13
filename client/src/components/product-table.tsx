@@ -47,8 +47,8 @@ export function ProductTable() {
   const queryClient = useQueryClient();
   
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all-categories');
+  const [statusFilter, setStatusFilter] = useState('all-status');
   const [sortBy, setSortBy] = useState('name-asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -62,10 +62,10 @@ export function ProductTable() {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           product.sku.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesCategory = categoryFilter === '' || product.category === categoryFilter;
+    const matchesCategory = categoryFilter === 'all-categories' || categoryFilter === '' || product.category === categoryFilter;
     
     const productStatus = getProductStatus(product.stock);
-    const matchesStatus = statusFilter === '' || productStatus === statusFilter;
+    const matchesStatus = statusFilter === 'all-status' || statusFilter === '' || productStatus === statusFilter;
     
     return matchesSearch && matchesCategory && matchesStatus;
   }).sort((a, b) => {
@@ -144,8 +144,8 @@ export function ProductTable() {
   
   function resetFilters() {
     setSearchQuery('');
-    setCategoryFilter('');
-    setStatusFilter('');
+    setCategoryFilter('all-categories');
+    setStatusFilter('all-status');
     setSortBy('name-asc');
   }
   
@@ -179,7 +179,7 @@ export function ProductTable() {
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all-categories">All Categories</SelectItem>
               <SelectItem value="Clothing">Clothing</SelectItem>
               <SelectItem value="Footwear">Footwear</SelectItem>
               <SelectItem value="Accessories">Accessories</SelectItem>
@@ -194,7 +194,7 @@ export function ProductTable() {
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Status</SelectItem>
+              <SelectItem value="all-status">All Status</SelectItem>
               <SelectItem value="In Stock">In Stock</SelectItem>
               <SelectItem value="Low Stock">Low Stock</SelectItem>
               <SelectItem value="Out of Stock">Out of Stock</SelectItem>
