@@ -10,7 +10,7 @@ import { z } from "zod";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import session from "express-session";
-import createMemoryStore from "memorystore";
+
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 
@@ -47,16 +47,15 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Set up authentication
-  const MemoryStore = createMemoryStore(session);
-  
+  // Set up authentication with session store from storage
   app.use(session({
-    secret: 'your-secret-key',
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    store: new MemoryStore({
-      checkPeriod: 86400000 // prune expired entries every 24h
-    })
+    store: storage.sessionStore,
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
   }));
   
   app.use(passport.initialize());
