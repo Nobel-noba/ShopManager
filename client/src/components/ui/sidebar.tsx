@@ -20,6 +20,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose, currentUser }: SidebarProps) {
   const [location] = useLocation();
+  const { logoutMutation } = useAuth();
   
   const isActive = (path: string) => {
     return location === path || (path !== '/' && location.startsWith(path));
@@ -123,7 +124,10 @@ export function Sidebar({ isOpen, onClose, currentUser }: SidebarProps) {
         
         {/* Sidebar Footer */}
         <div className="px-4 py-4 border-t border-gray-200">
-          <button className="flex items-center text-sm text-gray-700 hover:text-red-600 focus:outline-none">
+          <button 
+            onClick={() => logoutMutation.mutate()}
+            className="flex items-center text-sm text-gray-700 hover:text-red-600 focus:outline-none"
+          >
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </button>
