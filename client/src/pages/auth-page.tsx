@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,12 +10,6 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs';
 import { 
   Form, 
   FormControl, 
@@ -34,16 +27,9 @@ const loginSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
-const registerSchema = z.object({
-  username: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  name: z.string().min(1, 'Name is required'),
-});
-
 export default function AuthPage() {
   const [, navigate] = useLocation();
-  const { user, loginMutation, registerMutation } = useAuth();
-  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const { user, loginMutation } = useAuth();
   
   // If user is already logged in, redirect to dashboard
   if (user) {
@@ -60,31 +46,11 @@ export default function AuthPage() {
     },
   });
   
-  // Register form
-  const registerForm = useForm<z.infer<typeof registerSchema>>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      username: '',
-      password: '',
-      name: '',
-    },
-  });
-  
   // Submit login form
   function onLoginSubmit(values: z.infer<typeof loginSchema>) {
     loginMutation.mutate({
       username: values.username,
       password: values.password,
-    });
-  }
-  
-  // Submit register form
-  function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
-    registerMutation.mutate({
-      username: values.username,
-      password: values.password,
-      name: values.name,
-      role: 'staff', // Default role for new users
     });
   }
   
@@ -154,129 +120,48 @@ export default function AuthPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="login" className="w-full" value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'register')}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
-              </TabsList>
-              
-              {/* Login Form */}
-              <TabsContent value="login">
-                <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-                    <FormField
-                      control={loginForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="your@email.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={loginForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input type="password" placeholder="••••••" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button 
-                      type="submit" 
-                      className="w-full"
-                      disabled={loginMutation.isPending}
-                    >
-                      {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
-                    </Button>
-                  </form>
-                </Form>
-                <div className="mt-4 text-center text-sm">
-                  <p>
-                    Don't have an account?{' '}
-                    <button 
-                      className="text-primary hover:underline cursor-pointer"
-                      onClick={() => setActiveTab('register')}
-                    >
-                      Register
-                    </button>
-                  </p>
-                </div>
-              </TabsContent>
-              
-              {/* Register Form */}
-              <TabsContent value="register">
-                <Form {...registerForm}>
-                  <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
-                    <FormField
-                      control={registerForm.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Full Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="John Doe" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={registerForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="your@email.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={registerForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input type="password" placeholder="••••••" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button 
-                      type="submit" 
-                      className="w-full"
-                      disabled={registerMutation.isPending}
-                    >
-                      {registerMutation.isPending ? 'Creating account...' : 'Create Account'}
-                    </Button>
-                  </form>
-                </Form>
-                <div className="mt-4 text-center text-sm">
-                  <p>
-                    Already have an account?{' '}
-                    <button 
-                      className="text-primary hover:underline cursor-pointer"
-                      onClick={() => setActiveTab('login')}
-                    >
-                      Login
-                    </button>
-                  </p>
-                </div>
-              </TabsContent>
-            </Tabs>
+            <Form {...loginForm}>
+              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                <FormField
+                  control={loginForm.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="your@email.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={loginForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={loginMutation.isPending}
+                >
+                  {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
+                </Button>
+              </form>
+            </Form>
+            <div className="mt-4 text-center text-sm">
+              <p>
+                Contact your administrator to get a new account
+              </p>
+            </div>
           </CardContent>
           <CardFooter className="flex justify-center border-t pt-6">
             <p className="text-xs text-gray-500">

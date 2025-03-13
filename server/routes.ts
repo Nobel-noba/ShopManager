@@ -34,6 +34,12 @@ async function hashPassword(password: string) {
 }
 
 async function comparePasswords(supplied: string, stored: string) {
+  // Check if the stored password contains a salt (has a dot)
+  if (!stored.includes('.')) {
+    // For legacy passwords without salt, do direct comparison
+    return supplied === stored;
+  }
+  
   const [hashed, salt] = stored.split(".");
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
@@ -183,7 +189,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/users", async (req, res) => {
     try {
       const data = insertUserSchema.parse(req.body);
-      const user = await storage.createUser(data);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByUsername(data.username);
+      if (existingUser) {
+        return res.status(400).json({ message: 'Username already exists' });
+      }
+      
+      // Hash password
+      const hashedPassword = await hashPassword(data.password);
+      
+      // Create user with hashed password
+      const user = await storage.createUser({
+        ...data,
+        password: hashedPassword
+      });
+      
       res.status(201).json(user);
     } catch (error) {
       if (error instanceof z.ZodError) {
