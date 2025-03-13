@@ -58,6 +58,19 @@ export const insertSaleSchema = createInsertSchema(sales).pick({
   total: true,
 });
 
+// Categories model
+export const categories = pgTable("categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertCategorySchema = createInsertSchema(categories).pick({
+  name: true,
+  description: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -67,3 +80,6 @@ export type Product = typeof products.$inferSelect;
 
 export type InsertSale = z.infer<typeof insertSaleSchema>;
 export type Sale = typeof sales.$inferSelect;
+
+export type InsertCategory = z.infer<typeof insertCategorySchema>;
+export type Category = typeof categories.$inferSelect;

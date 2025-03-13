@@ -1,3 +1,4 @@
+import React from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -31,13 +32,8 @@ export default function AuthPage() {
   const [, navigate] = useLocation();
   const { user, loginMutation } = useAuth();
   
-  // If user is already logged in, redirect to dashboard
-  if (user) {
-    navigate('/');
-    return null;
-  }
-  
-  // Login form
+  // Login form - always initialize this hook regardless of user status
+  // to maintain hook order consistency
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -45,6 +41,14 @@ export default function AuthPage() {
       password: '',
     },
   });
+  
+  // Use useEffect for navigation to avoid hook order issues
+  React.useEffect(() => {
+    // If user is already logged in, redirect to dashboard
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
   
   // Submit login form
   function onLoginSubmit(values: z.infer<typeof loginSchema>) {

@@ -1,7 +1,8 @@
 import { 
   users, type User, type InsertUser,
   products, type Product, type InsertProduct,
-  sales, type Sale, type InsertSale
+  sales, type Sale, type InsertSale,
+  categories, type Category, type InsertCategory
 } from "@shared/schema";
 import session from "express-session";
 
@@ -18,6 +19,12 @@ export interface IStorage {
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product | undefined>;
   deleteProduct(id: number): Promise<boolean>;
+  
+  // Category operations
+  getCategory(id: number): Promise<Category | undefined>;
+  getCategories(): Promise<Category[]>;
+  createCategory(category: InsertCategory): Promise<Category>;
+  deleteCategory(id: number): Promise<boolean>;
   
   // Sales operations
   getSale(id: number): Promise<Sale | undefined>;
@@ -433,6 +440,26 @@ export class DatabaseStorage implements IStorage {
   
   async deleteProduct(id: number): Promise<boolean> {
     const result = await this.db.delete(products).where(eq(products.id, id)).returning();
+    return result.length > 0;
+  }
+  
+  // Category operations
+  async getCategory(id: number): Promise<Category | undefined> {
+    const result = await this.db.select().from(categories).where(eq(categories.id, id));
+    return result[0];
+  }
+  
+  async getCategories(): Promise<Category[]> {
+    return await this.db.select().from(categories);
+  }
+  
+  async createCategory(category: InsertCategory): Promise<Category> {
+    const result = await this.db.insert(categories).values(category).returning();
+    return result[0];
+  }
+  
+  async deleteCategory(id: number): Promise<boolean> {
+    const result = await this.db.delete(categories).where(eq(categories.id, id)).returning();
     return result.length > 0;
   }
   
