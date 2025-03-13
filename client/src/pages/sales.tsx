@@ -246,8 +246,17 @@ export default function Sales() {
                             <FormLabel>Price ($)</FormLabel>
                             <FormControl>
                               <Input 
-                                readOnly 
+                                type="number"
+                                min="0.01"
+                                step="0.01"
                                 {...field}
+                                onChange={(e) => {
+                                  field.onChange(e);
+                                  // Calculate total when price changes
+                                  const qty = form.getValues("quantity");
+                                  const newPrice = parseFloat(e.target.value) || 0;
+                                  form.setValue("total", (qty * newPrice).toFixed(2));
+                                }}
                               />
                             </FormControl>
                             <FormMessage />

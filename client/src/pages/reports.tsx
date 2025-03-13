@@ -149,7 +149,7 @@ export default function Reports() {
                       />
                       <Tooltip
                         formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Sales']}
-                        labelFormatter={(index) => dailySales[index].formattedDate}
+                        labelFormatter={(index) => index !== undefined && dailySales[index] ? dailySales[index].formattedDate : ''}
                       />
                       <Bar dataKey="value" fill="#4f46e5" radius={[4, 4, 0, 0]} />
                     </BarChart>

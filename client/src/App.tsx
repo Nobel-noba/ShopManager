@@ -10,29 +10,61 @@ import Sales from "@/pages/sales";
 import Reports from "@/pages/reports";
 import UserManagement from "@/pages/user-management";
 import Settings from "@/pages/settings";
+import AuthPage from "@/pages/auth-page";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
   return (
-    <AppLayout>
-      <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/dashboard" component={Dashboard} />
-        <Route path="/inventory" component={Inventory} />
-        <Route path="/sales" component={Sales} />
-        <Route path="/reports" component={Reports} />
-        <Route path="/users" component={UserManagement} />
-        <Route path="/settings" component={Settings} />
-        <Route component={NotFound} />
-      </Switch>
-    </AppLayout>
+    <Switch>
+      <Route path="/auth" component={AuthPage} />
+      <ProtectedRoute path="/" component={() => (
+        <AppLayout>
+          <Dashboard />
+        </AppLayout>
+      )} />
+      <ProtectedRoute path="/dashboard" component={() => (
+        <AppLayout>
+          <Dashboard />
+        </AppLayout>
+      )} />
+      <ProtectedRoute path="/inventory" component={() => (
+        <AppLayout>
+          <Inventory />
+        </AppLayout>
+      )} />
+      <ProtectedRoute path="/sales" component={() => (
+        <AppLayout>
+          <Sales />
+        </AppLayout>
+      )} />
+      <ProtectedRoute path="/reports" component={() => (
+        <AppLayout>
+          <Reports />
+        </AppLayout>
+      )} />
+      <ProtectedRoute path="/users" component={() => (
+        <AppLayout>
+          <UserManagement />
+        </AppLayout>
+      )} />
+      <ProtectedRoute path="/settings" component={() => (
+        <AppLayout>
+          <Settings />
+        </AppLayout>
+      )} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
