@@ -39,7 +39,7 @@ export function DashboardChart({ data }: DashboardChartProps) {
   const renderTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-2 border border-gray-200 shadow-sm rounded-md">
+        <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 shadow-sm rounded-md dark:text-white">
           <p className="font-medium">{`${payload[0].payload.name}`}</p>
           <p className="text-primary">{`$${payload[0].value.toFixed(2)}`}</p>
         </div>
@@ -49,9 +49,9 @@ export function DashboardChart({ data }: DashboardChartProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-100 dark:border-gray-700">
       <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-        <h3 className="font-semibold text-gray-800">Sales Performance</h3>
+        <h3 className="font-semibold text-gray-800 dark:text-white">Sales Performance</h3>
         <Select value={timeRange} onValueChange={(value: any) => setTimeRange(value)}>
           <SelectTrigger className="w-36 text-sm border border-gray-300 rounded">
             <SelectValue placeholder="Select time range" />

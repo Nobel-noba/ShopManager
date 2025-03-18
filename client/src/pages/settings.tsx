@@ -34,6 +34,8 @@ export default function Settings() {
   const [defaultCategory, setDefaultCategory] = useState("Clothing");
   const [currencyFormat, setCurrencyFormat] = useState("USD");
   const [dateFormat, setDateFormat] = useState("MM/DD/YYYY");
+  const [exportType, setExportType] = useState("inventory");
+  const [dateRange, setDateRange] = useState("all");
   
   const handleSaveGeneralSettings = () => {
     // In a real app, this would save to a database
@@ -50,11 +52,42 @@ export default function Settings() {
       description: "Your display settings have been updated",
     });
   };
+
+  const handleExportData = async () => {
+    try {
+      const response = await fetch(`/api/export/${exportType}${exportType === 'sales' && dateRange !== 'all' ? `?dateRange=${dateRange}` : ''}`);
+      
+      if (!response.ok) {
+        throw new Error('Export failed');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${exportType}-${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Export Successful",
+        description: `${exportType.charAt(0).toUpperCase() + exportType.slice(1)} data has been exported successfully`
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting the data. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
   
   return (
-    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
+    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">System Settings</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">System Settings</h2>
         
         <Tabs defaultValue="general" className="space-y-6">
           <TabsList>
@@ -94,7 +127,7 @@ export default function Settings() {
                         value={lowStockThreshold}
                         onChange={(e) => setLowStockThreshold(e.target.value)}
                       />
-                      <p className="text-xs text-gray-500">Items with stock below this value will be marked as low stock</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Items with stock below this value will be marked as low stock</p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="receiptPrefix">Receipt Prefix</Label>
@@ -103,7 +136,7 @@ export default function Settings() {
                         value={receiptPrefix}
                         onChange={(e) => setReceiptPrefix(e.target.value)}
                       />
-                      <p className="text-xs text-gray-500">Prefix for invoice numbers (e.g. INV-001)</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Prefix for invoice numbers (e.g. INV-001)</p>
                     </div>
                   </div>
                   
@@ -116,7 +149,7 @@ export default function Settings() {
                         onCheckedChange={setShowProfitInReports}
                       />
                     </div>
-                    <p className="text-xs text-gray-500">Display profit information in financial reports</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Display profit information in financial reports</p>
                   </div>
                 </div>
                 
@@ -209,7 +242,7 @@ export default function Settings() {
                       <Label htmlFor="darkMode">Dark Mode</Label>
                       <Switch id="darkMode" />
                     </div>
-                    <p className="text-xs text-gray-500">Use dark theme for the application</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Use dark theme for the application</p>
                   </div>
                   
                   <div className="space-y-2">
@@ -217,7 +250,7 @@ export default function Settings() {
                       <Label htmlFor="compactMode">Compact Mode</Label>
                       <Switch id="compactMode" />
                     </div>
-                    <p className="text-xs text-gray-500">Reduce spacing and show more content per screen</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Reduce spacing and show more content per screen</p>
                   </div>
                 </div>
                 
@@ -287,7 +320,7 @@ export default function Settings() {
                   <div className="space-y-2">
                     <h3 className="font-medium">Create Backup</h3>
                     <p className="text-sm text-gray-500">Create a backup of all your shop data</p>
-                    <Button className="mt-2">
+                    <Button className="mt-2" onClick={handleExportData}>
                       Export Data Backup
                     </Button>
                   </div>

@@ -10,8 +10,10 @@ import { StatCard } from '@/components/ui/stat-card';
 import { DashboardChart } from '@/components/ui/dashboard-chart';
 import { RecentSalesTable } from '@/components/recent-sales-table';
 import { LowStockItems } from '@/components/low-stock-items';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function Dashboard() {
+  const { user } = useAuth();
   // Get dashboard data
   const { data: dashboardData, isLoading } = useQuery({
     queryKey: ['/api/reports/dashboard']
@@ -48,7 +50,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
+    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         {/* Quick Stats Section */}
         <section className="mb-8">
@@ -96,10 +98,12 @@ export default function Dashboard() {
             <RecentSalesTable />
           </div>
           
-          {/* Low Stock Items */}
-          <div>
-            <LowStockItems />
-          </div>
+          {/* Low Stock Items - Only show for admin users */}
+          {user?.role === 'admin' && (
+            <div>
+              <LowStockItems />
+            </div>
+          )}
         </section>
         
         {/* Sales Performance Chart */}

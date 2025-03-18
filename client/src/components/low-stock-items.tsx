@@ -75,12 +75,12 @@ export function LowStockItems({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-100 dark:border-gray-700">
       {showHeader && (
         <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-          <h3 className="font-semibold text-gray-800">Low Stock Items</h3>
+          <h3 className="font-semibold text-gray-800 dark:text-white">Low Stock Items</h3>
           {showViewAll && (
-            <a href="/inventory" className="text-sm text-primary font-medium hover:underline">
+            <a href="/inventory" className="text-sm text-primary dark:text-primary-foreground font-medium hover:underline">
               View All
             </a>
           )}

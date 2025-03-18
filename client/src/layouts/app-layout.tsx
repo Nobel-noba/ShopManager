@@ -1,9 +1,9 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
 import { Sidebar } from '@/components/ui/sidebar';
-import { Menu, Bell } from 'lucide-react';
-import { User } from '@shared/schema';
+import { Menu, Bell, Moon, Sun } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { useTheme } from '@/contexts/theme-context';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -14,12 +14,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pageTitle, setPageTitle] = useState('Dashboard');
   
-  // In a real app, this would be a session check or user fetch
-  // For now, we'll use the admin user from our storage
-  const { data: currentUser } = useQuery<User>({
-    queryKey: ['/api/users'],
-    select: (users) => users[0] // Just take the first user (admin)
-  });
+  const { user: currentUser } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   
   // Update page title based on location
   useEffect(() => {
@@ -32,21 +28,27 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }, [location]);
   
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
+    <div className="min-h-screen flex flex-col md:flex-row bg-white dark:bg-gray-900">
       {/* Mobile Header */}
-      <header className="bg-white border-b border-gray-200 md:hidden py-4 px-4 flex items-center justify-between">
+      <header className="bg-white border-b border-gray-200 md:hidden py-4 px-4 flex items-center justify-between dark:bg-gray-800 dark:border-gray-700">
         <div className="flex items-center">
           <button 
             onClick={() => setSidebarOpen(true)} 
-            className="mr-2 text-gray-600 focus:outline-none"
+            className="mr-2 text-gray-600 focus:outline-none dark:text-gray-300"
           >
             <Menu className="h-6 w-6" />
           </button>
-          <h1 className="text-lg font-bold text-primary">ShopManager</h1>
+          <h1 className="text-lg font-bold text-primary dark:text-white">ShopManager</h1>
         </div>
         <div className="flex items-center space-x-3">
+          <button
+            onClick={toggleTheme}
+            className="text-gray-600 focus:outline-none dark:text-gray-300"
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </button>
           <div className="relative">
-            <button className="text-gray-600 focus:outline-none">
+            <button className="text-gray-600 focus:outline-none dark:text-gray-300">
               <Bell className="h-5 w-5" />
             </button>
             <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
@@ -67,13 +69,19 @@ export default function AppLayout({ children }: AppLayoutProps) {
       )}
       
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 min-h-screen flex flex-col">
+      <main className="flex-1 md:ml-64 min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
         {/* Desktop Header */}
-        <header className="bg-white border-b border-gray-200 hidden md:flex items-center justify-between py-4 px-6">
-          <h1 className="text-xl font-bold text-gray-800">{pageTitle}</h1>
+        <header className="bg-white border-b border-gray-200 hidden md:flex items-center justify-between py-4 px-6 dark:bg-gray-800 dark:border-gray-700">
+          <h1 className="text-xl font-bold text-gray-800 dark:text-white">{pageTitle}</h1>
           <div className="flex items-center space-x-4">
+            <button
+              onClick={toggleTheme}
+              className="text-gray-600 focus:outline-none dark:text-gray-300"
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
             <div className="relative">
-              <button className="text-gray-600 focus:outline-none">
+              <button className="text-gray-600 focus:outline-none dark:text-gray-300">
                 <Bell className="h-5 w-5" />
               </button>
               <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>

@@ -166,7 +166,7 @@ export function ProductTable() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Inventory Management</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 md:mb-0">Inventory Management</h2>
         <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
           <div className="relative">
             <Input 
@@ -174,9 +174,9 @@ export function ProductTable() {
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 dark:text-gray-100 dark:placeholder-gray-400"
             />
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" />
           </div>
           {isAdmin && (
             <Button onClick={() => setIsAddModalOpen(true)}>
@@ -187,11 +187,11 @@ export function ProductTable() {
       </div>
       
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow mb-6 p-4 md:flex md:items-center md:space-x-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6 p-4 md:flex md:items-center md:space-x-4">
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger>
+            <SelectTrigger className="dark:text-gray-100">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
@@ -204,9 +204,9 @@ export function ProductTable() {
           </Select>
         </div>
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger>
+            <SelectTrigger className="dark:text-gray-100">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
@@ -218,9 +218,9 @@ export function ProductTable() {
           </Select>
         </div>
         <div className="mb-4 md:mb-0 md:w-1/4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger>
+            <SelectTrigger className="dark:text-gray-100">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -235,7 +235,7 @@ export function ProductTable() {
         <div className="md:w-1/4 flex items-end">
           <Button 
             variant="outline" 
-            className="w-full" 
+            className="w-full dark:text-gray-300 dark:hover:text-white" 
             onClick={resetFilters}
           >
             Reset Filters
@@ -244,88 +244,63 @@ export function ProductTable() {
       </div>
       
       {/* Product Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Status</TableHead>
-                {isAdmin && <TableHead className="text-right">Actions</TableHead>}
+              <TableRow className="bg-gray-50 dark:bg-gray-800">
+                <TableHead className="text-gray-600 dark:text-gray-300">Product</TableHead>
+                <TableHead className="text-gray-600 dark:text-gray-300">Category</TableHead>
+                <TableHead className="text-gray-600 dark:text-gray-300">SKU</TableHead>
+                <TableHead className="text-gray-600 dark:text-gray-300">Price</TableHead>
+                <TableHead className="text-gray-600 dark:text-gray-300">Stock</TableHead>
+                <TableHead className="text-gray-600 dark:text-gray-300">Status</TableHead>
+                {isAdmin && <TableHead className="text-gray-600 dark:text-gray-300">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-10">
-                    Loading products...
-                  </TableCell>
-                </TableRow>
-              ) : paginatedProducts.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-10">
-                    No products found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                paginatedProducts.map((product) => {
-                  const status = getProductStatus(product.stock);
-                  return (
-                    <TableRow key={product.id}>
+              {paginatedProducts.map((product) => {
+                const status = getProductStatus(product.stock);
+                return (
+                  <TableRow key={product.id} className="border-b border-gray-200 dark:border-gray-700">
+                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">{product.name}</TableCell>
+                    <TableCell className="text-gray-700 dark:text-gray-300">
+                      <div className="flex items-center gap-2">
+                        {getCategoryIcon(product.category)}
+                        {product.category}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-gray-700 dark:text-gray-300">{product.sku}</TableCell>
+                    <TableCell className="text-gray-700 dark:text-gray-300">${typeof product.price === 'string' ? parseFloat(product.price).toFixed(2) : product.price.toFixed(2)}</TableCell>
+                    <TableCell className="text-gray-700 dark:text-gray-300">{product.stock}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusBadgeVariant(status)}>{status}</Badge>
+                    </TableCell>
+                    {isAdmin && (
                       <TableCell>
-                        <div className="flex items-center">
-                          <div className="h-10 w-10 flex-shrink-0 rounded bg-gray-100 flex items-center justify-center">
-                            {getCategoryIcon(product.category)}
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                            <div className="text-sm text-gray-500">SKU: {product.sku}</div>
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditProduct(product)}
+                            className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteProduct(product.id)}
+                            className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="text-sm text-gray-900">{product.category}</div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm text-gray-900">${parseFloat(product.price).toFixed(2)}</div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm text-gray-900">{product.stock}</div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusBadgeVariant(status)}>
-                          {status}
-                        </Badge>
-                      </TableCell>
-                      {isAdmin && (
-                        <TableCell className="text-right">
-                          <div className="flex justify-end space-x-2">
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
-                              className="h-8 w-8 p-0"
-                              onClick={() => handleEditProduct(product)}
-                            >
-                              <Pencil className="h-4 w-4 text-primary" />
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
-                              className="h-8 w-8 p-0"
-                              onClick={() => handleDeleteProduct(product.id)}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-600" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  );
-                })
-              )}
+                    )}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>

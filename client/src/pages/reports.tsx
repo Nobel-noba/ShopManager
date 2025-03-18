@@ -16,6 +16,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Product, Sale } from '@shared/schema';
+import { SalesSheet } from '@/components/reports/sales-sheet';
 
 export default function Reports() {
   const { data: dashboardData } = useQuery({
@@ -77,15 +78,22 @@ export default function Reports() {
   };
   
   return (
-    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
+    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Business Reports</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Business Reports</h2>
         
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <Tabs defaultValue="overview" className="mb-6">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="sales">Sales Sheet</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview">
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-gray-500">Total Sales</CardTitle>
+              <CardTitle className="text-sm text-gray-500 dark:text-gray-400">Total Sales</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -96,7 +104,7 @@ export default function Reports() {
           
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-gray-500">Total Profit</CardTitle>
+              <CardTitle className="text-sm text-gray-500 dark:text-gray-400">Total Profit</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -107,7 +115,7 @@ export default function Reports() {
           
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-gray-500">Inventory Value</CardTitle>
+              <CardTitle className="text-sm text-gray-500 dark:text-gray-400">Inventory Value</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -116,6 +124,12 @@ export default function Reports() {
             </CardContent>
           </Card>
         </div>
+          </TabsContent>
+
+          <TabsContent value="sales">
+            <SalesSheet />
+          </TabsContent>
+        </Tabs>
         
         {/* Charts Section */}
         <Tabs defaultValue="sales" className="mb-6">

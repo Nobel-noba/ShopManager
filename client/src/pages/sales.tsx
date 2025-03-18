@@ -159,21 +159,21 @@ export default function Sales() {
   }
 
   return (
-    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
+    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col-reverse md:flex-row gap-6">
           {/* Sales History */}
           <div className="md:w-2/3">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Sales History</h2>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Sales History</h2>
             <RecentSalesTable limit={10} showHeader={false} showViewAll={false} />
           </div>
           
           {/* New Sale Form */}
           <div className="md:w-1/3">
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
-                <CardTitle>Record New Sale</CardTitle>
-                <CardDescription>
+                <CardTitle className="dark:text-white">Record New Sale</CardTitle>
+                <CardDescription className="dark:text-gray-400">
                   Add a new sales transaction
                 </CardDescription>
               </CardHeader>
@@ -185,7 +185,7 @@ export default function Sales() {
                       name="productId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Product</FormLabel>
+                          <FormLabel className="dark:text-gray-300">Product</FormLabel>
                           <Select 
                             onValueChange={handleProductChange}
                             value={field.value.toString()}
@@ -223,7 +223,7 @@ export default function Sales() {
                         name="quantity"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Quantity</FormLabel>
+                            <FormLabel className="dark:text-gray-300">Quantity</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number" 
@@ -243,7 +243,7 @@ export default function Sales() {
                         name="price"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Price ($)</FormLabel>
+                            <FormLabel className="dark:text-gray-300">Price ($)</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number"
@@ -270,11 +270,11 @@ export default function Sales() {
                       name="total"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Total ($)</FormLabel>
+                          <FormLabel className="dark:text-gray-300">Total ($)</FormLabel>
                           <FormControl>
                             <Input 
                               readOnly 
-                              className="font-bold" 
+                              className="font-bold dark:bg-gray-700 dark:text-gray-300" 
                               {...field}
                             />
                           </FormControl>

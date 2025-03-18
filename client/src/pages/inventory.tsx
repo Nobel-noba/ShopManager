@@ -11,10 +11,10 @@ export default function Inventory() {
   const isAdmin = user?.role === 'admin';
   
   return (
-    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
+    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h1 className="text-2xl font-bold">Inventory Management</h1>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Inventory Management</h1>
           {isAdmin && (
             <div className="flex flex-row gap-2">
               <Button 
