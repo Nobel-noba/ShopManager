@@ -271,7 +271,7 @@ export function ProductTable() {
                       </div>
                     </TableCell>
                     <TableCell className="text-gray-700 dark:text-gray-300">{product.sku}</TableCell>
-                    <TableCell className="text-gray-700 dark:text-gray-300">${typeof product.price === 'string' ? parseFloat(product.price).toFixed(2) : product.price.toFixed(2)}</TableCell>
+                    <TableCell className="text-gray-700 dark:text-gray-300">${product.price.toFixed(2)}</TableCell>
                     <TableCell className="text-gray-700 dark:text-gray-300">{product.stock}</TableCell>
                     <TableCell>
                       <Badge variant={getStatusBadgeVariant(status)}>{status}</Badge>

@@ -397,52 +397,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Export routes
-  app.get("/api/export/:type", async (req, res) => {
-    try {
-      const type = req.params.type;
-      const dateRange = req.query.dateRange as string;
-      
-      let data;
-      if (type === 'inventory') {
-        data = await storage.getProducts();
-      } else if (type === 'sales') {
-        data = await storage.getSales();
-        if (dateRange && dateRange !== 'all') {
-          const now = new Date();
-          const startDate = new Date();
-          
-          switch(dateRange) {
-            case 'week':
-              startDate.setDate(now.getDate() - 7);
-              break;
-            case 'month':
-              startDate.setMonth(now.getMonth() - 1);
-              break;
-            case 'year':
-              startDate.setFullYear(now.getFullYear() - 1);
-              break;
-          }
-          
-          data = data.filter(sale => new Date(sale.createdAt) >= startDate);
-        }
-      } else {
-        return res.status(400).json({ message: 'Invalid export type' });
-      }
-      
-      // Convert data to CSV format
-      const headers = Object.keys(data[0] || {}).join(',');
-      const rows = data.map(item => Object.values(item).join(','));
-      const csv = [headers, ...rows].join('\n');
-      
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', `attachment; filename=${type}-${new Date().toISOString().split('T')[0]}.csv`);
-      res.send(csv);
-    } catch (error) {
-      res.status(500).json({ message: 'Error exporting data' });
-    }
-  });
-
   app.get("/api/reports/dashboard", async (req, res) => {
     try {
       const [products, sales, totalSales, totalProfit, lowStockProducts] = await Promise.all([

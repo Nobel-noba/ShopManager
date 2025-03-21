@@ -223,7 +223,7 @@ export default function Sales() {
                         name="quantity"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="dark:text-gray-300">Quantity</FormLabel>
+                            <FormLabel>Quantity</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number" 
@@ -243,7 +243,7 @@ export default function Sales() {
                         name="price"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="dark:text-gray-300">Price ($)</FormLabel>
+                            <FormLabel>Price ($)</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number"
@@ -270,11 +270,11 @@ export default function Sales() {
                       name="total"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="dark:text-gray-300">Total ($)</FormLabel>
+                          <FormLabel>Total ($)</FormLabel>
                           <FormControl>
                             <Input 
                               readOnly 
-                              className="font-bold dark:bg-gray-700 dark:text-gray-300" 
+                              className="font-bold" 
                               {...field}
                             />
                           </FormControl>

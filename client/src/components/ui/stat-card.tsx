@@ -23,11 +23,11 @@ export function StatCard({
   iconClass = "text-primary"
 }: StatCardProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-5 border border-gray-100 dark:border-gray-700">
+    <div className="bg-white rounded-lg shadow p-5 border border-gray-100">
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{label}</p>
-          <h3 className="text-2xl font-bold mt-1 dark:text-white">{value}</h3>
+          <p className="text-sm text-gray-500 font-medium">{label}</p>
+          <h3 className="text-2xl font-bold mt-1">{value}</h3>
           {trend && (
             <div className="flex items-center mt-2">
               <span className={cn(
@@ -45,7 +45,7 @@ export function StatCard({
                 )}
                 {Math.abs(trend.value)}%
               </span>
-              {trend.label && <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">{trend.label}</span>}
+              {trend.label && <span className="text-xs text-gray-500 ml-2">{trend.label}</span>}
             </div>
           )}
         </div>

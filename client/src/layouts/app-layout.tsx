@@ -69,7 +69,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       )}
       
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+      <main className="flex-1 md:ml-64 min-h-screen flex flex-col bg-white dark:bg-gray-900">
         {/* Desktop Header */}
         <header className="bg-white border-b border-gray-200 hidden md:flex items-center justify-between py-4 px-6 dark:bg-gray-800 dark:border-gray-700">
           <h1 className="text-xl font-bold text-gray-800 dark:text-white">{pageTitle}</h1>

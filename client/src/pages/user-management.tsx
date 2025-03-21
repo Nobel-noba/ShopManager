@@ -103,18 +103,18 @@ export default function UserManagement() {
   }
 
   return (
-    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
+    <div className="flex-1 p-4 md:p-6 overflow-auto bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 md:mb-0">User Management</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">User Management</h2>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button>Add New User</Button>
             </DialogTrigger>
-            <DialogContent className="dark:bg-gray-800">
+            <DialogContent>
               <DialogHeader>
-                <DialogTitle className="dark:text-white">Add New User</DialogTitle>
-                <DialogDescription className="dark:text-gray-300">
+                <DialogTitle>Add New User</DialogTitle>
+                <DialogDescription>
                   Create a new user account with appropriate permissions.
                 </DialogDescription>
               </DialogHeader>
@@ -126,9 +126,9 @@ export default function UserManagement() {
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">Email</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="user@example.com" {...field} className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+                          <Input type="email" placeholder="user@example.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -140,9 +140,9 @@ export default function UserManagement() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">Password</FormLabel>
+                        <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" {...field} className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+                          <Input type="password" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -154,9 +154,9 @@ export default function UserManagement() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">Full Name</FormLabel>
+                        <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input {...field} className="dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -168,19 +168,19 @@ export default function UserManagement() {
                     name="role"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="dark:text-gray-200">Role</FormLabel>
+                        <FormLabel>Role</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                            <SelectTrigger>
                               <SelectValue placeholder="Select a role" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="dark:bg-gray-800 dark:text-white dark:border-gray-600">
-                            <SelectItem value="admin" className="dark:hover:bg-gray-700">Admin</SelectItem>
-                            <SelectItem value="staff" className="dark:hover:bg-gray-700">Staff</SelectItem>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="staff">Staff</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

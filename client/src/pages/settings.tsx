@@ -53,35 +53,12 @@ export default function Settings() {
     });
   };
 
-  const handleExportData = async () => {
-    try {
-      const response = await fetch(`/api/export/${exportType}${exportType === 'sales' && dateRange !== 'all' ? `?dateRange=${dateRange}` : ''}`);
-      
-      if (!response.ok) {
-        throw new Error('Export failed');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${exportType}-${new Date().toISOString().split('T')[0]}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast({
-        title: "Export Successful",
-        description: `${exportType.charAt(0).toUpperCase() + exportType.slice(1)} data has been exported successfully`
-      });
-    } catch (error) {
-      toast({
-        title: "Export Failed",
-        description: "There was an error exporting the data. Please try again.",
-        variant: "destructive"
-      });
-    }
+  const handleExportData = () => {
+    // In a real app, this would call an API to generate and download the spreadsheet
+    toast({
+      title: "Export Started",
+      description: `Exporting ${exportType} data${exportType === 'sales' ? ` for ${dateRange}` : ''}`
+    });
   };
   
   return (
